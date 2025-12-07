@@ -1,0 +1,20 @@
+<div class="positions-panel">
+  <div class="header">
+    <span>Positions</span>
+    <button (click)="createPosition.emit()">+</button>
+  </div>
+
+  <div
+    cdkDropList
+    [cdkDropListData]="positions"
+    class="positions-list">
+
+    <div
+      *ngFor="let pos of positions"
+      cdkDrag
+      [cdkDragData]="{ type: 'position', position: pos }"
+      class="position-item">
+      {{ pos.code }} - {{ pos.name }}
+    </div>
+  </div>
+</div>

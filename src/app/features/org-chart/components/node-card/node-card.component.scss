@@ -1,0 +1,15 @@
+.node-card {
+    position: relative;
+
+    &:hover .delete-btn {
+        opacity: 1;
+    }
+}
+
+.delete-btn {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    opacity: 0;
+    transition: opacity 0.2s;
+}

@@ -1,0 +1,19 @@
+<div class="level-lane">
+  <div class="level-title">Level {{ level }}</div>
+
+  <div
+    cdkDropList
+    [cdkDropListData]="nodes"
+    (cdkDropListDropped)="onDrop($event)"
+    class="level-drop-zone">
+
+    <app-node-card
+      *ngFor="let node of nodes"
+      cdkDrag
+      [node]="node"
+      [isHighlighted]="hoveredNodeId === node.id"
+      (delete)="deleteNode.emit(node)"
+      (hover)="hoverNode.emit(node)">
+    </app-node-card>
+  </div>
+</div>

@@ -1,0 +1,25 @@
+<div
+  class="node-card"
+  [class.node-card--highlighted]="isHighlighted"
+  (mouseenter)="onMouseEnter()"
+  (mouseleave)="onMouseLeave()"
+>
+  <div class="node-card-header">
+    <span class="node-title">
+      {{ node.position?.title || ('Node #' + node.id) }}
+    </span>
+
+    <button
+      type="button"
+      class="delete-btn"
+      (click)="onDeleteClick($event)"
+      aria-label="ลบตำแหน่งนี้"
+    >
+      ×
+    </button>
+  </div>
+
+  <div class="node-card-body">
+    Level: {{ node.level }}
+  </div>
+</div>

@@ -1,0 +1,20 @@
+<div class="org-layout">
+  <div class="org-main">
+    <div *ngFor="let lvl of levels" class="level-row">
+      <app-level-lane
+        [level]="lvl"
+        [nodes]="nodesByLevel[lvl]"
+        (dropNewNode)="onDropNewNode($event)"
+        (deleteNode)="onDeleteNode($event)"
+        (hoverNode)="onHoverNode($event)">
+      </app-level-lane>
+    </div>
+  </div>
+
+  <div class="org-sidebar">
+    <app-positions-panel
+      [positions]="availablePositions"
+      (createPosition)="openCreatePositionDialog()">
+    </app-positions-panel>
+  </div>
+</div>

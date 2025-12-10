@@ -15,17 +15,15 @@ export class ApiService {
 
     constructor(private http: HttpClient) { }
 
-    // TResponse = type ของข้อมูลที่ "ได้กลับมา"
-    get<TResponse>(url: string, params?: ApiParams) {
-        return this.http.get<TResponse>(`${this.baseUrl}${url}`, { params });
+    get<T>(url: string, params?: ApiParams) {
+        return this.http.get<T>(`${this.baseUrl}${url}`, { params });
     }
 
-    // TResponse = response, TBody = type ของ body ที่ส่งขึ้นไป
     post<TResponse, TBody = unknown>(url: string, body: TBody) {
         return this.http.post<TResponse>(`${this.baseUrl}${url}`, body);
     }
 
-    delete<TResponse>(url: string, params?: ApiParams) {
-        return this.http.delete<TResponse>(`${this.baseUrl}${url}`, { params });
+    delete<T>(url: string, params?: ApiParams) {
+        return this.http.delete<T>(`${this.baseUrl}${url}`, { params });
     }
 }

@@ -1,0 +1,31 @@
+import type { VercelRequest, VercelResponse } from '@vercel/node';
+import { execute } from '../../_db';
+
+export default async function handler(req: VercelRequest, res: VercelResponse): Promise<void> {
+    if (req.method !== 'DELETE') {
+        res.status(405).json({ message: 'Method not allowed' });
+        return;
+    }
+
+    const { id } = req.query;
+    const idAsString = Array.isArray(id) ? id[0] : id;
+
+    const idNumber = Number(idAsString);
+
+    if (!Number.isInteger(idNumber) || idNumber <= 0) {
+        res.status(400).json({ message: 'Invalid node id' });
+        return;
+    }
+
+    try {
+        await execute('DELETE FROM org_nodes WHERE id = $1', [idNumber]);
+        res.status(204).end();
+    } catch (error) {
+        const err = error as { message?: string };
+
+        res.status(500).json({
+            message: 'Failed to delete node',
+            error: err.message ?? 'Unknown error',
+        });
+    }
+}

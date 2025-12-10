@@ -1,8 +1,11 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { OrgNode } from '../../../../core/models/org-node.model';
 
 @Component({
     selector: 'app-node-card',
+    standalone: true,
+    imports: [CommonModule],
     templateUrl: './node-card.component.html',
     styleUrls: ['./node-card.component.scss'],
 })

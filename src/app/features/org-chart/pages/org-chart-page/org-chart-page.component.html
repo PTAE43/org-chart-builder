@@ -1,20 +1,25 @@
-<div class="org-layout">
-  <div class="org-main">
-    <div *ngFor="let lvl of levels" class="level-row">
-      <app-level-lane
-        [level]="lvl"
-        [nodes]="nodesByLevel[lvl]"
-        (dropNewNode)="onDropNewNode($event)"
-        (deleteNode)="onDeleteNode($event)"
-        (hoverNode)="onHoverNode($event)">
-      </app-level-lane>
-    </div>
+<div class="org-chart-page">
+  <h2>Org Chart Builder</h2>
+
+  <p *ngIf="errorMessage" class="error-message">
+    {{ errorMessage }}
+  </p>
+
+  <div *ngIf="isLoading">
+    กำลังโหลดข้อมูล...
   </div>
 
-  <div class="org-sidebar">
-    <app-positions-panel
-      [positions]="availablePositions"
-      (createPosition)="openCreatePositionDialog()">
-    </app-positions-panel>
+  <div *ngIf="!isLoading && !errorMessage">
+    <div class="lanes-container">
+      <app-level-lane
+        *ngFor="let lane of lanes"
+        [level]="lane.level"
+        [nodes]="lane.nodes"
+        [hoveredNodeId]="hoveredNodeId"
+        (nodeDropped)="handleDrop($event)"
+        (deleteNode)="onDeleteNode($event)"
+        (hoverNode)="onHoverNode($event)"
+      ></app-level-lane>
+    </div>
   </div>
 </div>

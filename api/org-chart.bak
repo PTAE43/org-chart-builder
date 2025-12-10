@@ -1,0 +1,100 @@
+import type { VercelRequest, VercelResponse } from '@vercel/node';
+import { queryRows, DbOrgNodeRow, DbPositionRow } from './_db';
+
+// type ที่ส่งให้ frontend
+export interface PositionDto {
+    id: number;
+    title: string;
+    level: number;
+}
+
+export interface OrgNodeDto {
+    id: number;
+    positionId: number;
+    level: number;
+    parentNodeId: number | null;
+    position?: PositionDto;
+    children?: OrgNodeDto[];
+}
+
+// สร้าง tree จาก flat list (typed)
+function buildTree(nodes: OrgNodeDto[]): OrgNodeDto[] {
+    const map = new Map<number, OrgNodeDto>();
+    const roots: OrgNodeDto[] = [];
+
+    nodes.forEach((node) => {
+        map.set(node.id, node);
+    });
+
+    nodes.forEach((node) => {
+        if (node.parentNodeId === null) {
+            roots.push(node);
+            return;
+        }
+
+        const parent = map.get(node.parentNodeId);
+        if (!parent) {
+            roots.push(node);
+            return;
+        }
+
+        if (!parent.children) {
+            parent.children = [];
+        }
+        parent.children.push(node);
+    });
+
+    return roots;
+}
+
+export default async function handler(req: VercelRequest, res: VercelResponse): Promise<void> {
+    if (req.method !== 'GET') {
+        res.status(405).json({ message: 'Method not allowed' });
+        return;
+    }
+
+    try {
+        const positionRows = await queryRows<DbPositionRow>(
+            'SELECT id, title, level FROM positions ORDER BY level, id'
+        );
+
+        const nodeRows = await queryRows<DbOrgNodeRow>(
+            'SELECT id, position_id, level, parent_node_id FROM org_nodes ORDER BY level, id'
+        );
+
+        const positionsById = new Map<number, PositionDto>();
+        positionRows.forEach((p) => {
+            positionsById.set(p.id, {
+                id: p.id,
+                title: p.title,
+                level: p.level,
+            });
+        });
+
+        const nodeDtos: OrgNodeDto[] = nodeRows.map((n) => {
+            const position = positionsById.get(n.position_id);
+
+            return {
+                id: n.id,
+                positionId: n.position_id,
+                level: n.level,
+                parentNodeId: n.parent_node_id,
+                position,
+            };
+        });
+
+        const tree = buildTree(nodeDtos);
+
+        res.status(200).json({
+            positions: Array.from(positionsById.values()),
+            tree,
+        });
+    } catch (error) {
+        const err = error as unknown as { message?: string };
+
+        res.status(500).json({
+            message: 'Failed to load org chart',
+            error: err?.message ?? 'Unknown error',
+        });
+    }
+}

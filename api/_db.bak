@@ -1,0 +1,44 @@
+import { Pool } from 'pg';
+
+const connectionString = process.env.DATABASE_URL;
+
+if (!connectionString) {
+    throw new Error('NEON_DATABASE_URL is not set');
+}
+
+export const pool = new Pool({
+    connectionString,
+    ssl: { rejectUnauthorized: false },
+});
+
+export interface DbPositionRow {
+    id: number;
+    title: string;
+    level: number;
+}
+
+export interface DbOrgNodeRow {
+    id: number;
+    position_id: number;
+    level: number;
+    parent_node_id: number | null;
+}
+
+export async function queryRows<T>(sql: string, params: unknown[] = []): Promise<T[]> {
+    const client = await pool.connect();
+    try {
+        const result = await client.query(sql, params as never[]);
+        return result.rows as T[];
+    } finally {
+        client.release();
+    }
+}
+
+export async function execute(sql: string, params: unknown[] = []): Promise<void> {
+    const client = await pool.connect();
+    try {
+        await client.query(sql, params as never[]);
+    } finally {
+        client.release();
+    }
+}
